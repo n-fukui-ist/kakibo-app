@@ -109,7 +109,7 @@ try:
 except Exception as e:
     # もし接続などでエラーが出たらここに表示
     st.error("削除機能の読み込みに失敗しました")
-    # st.text(e) # 必要なら詳細を表示
+    st.text(e) # 必要なら詳細を表示
 
 try:
     sheet = connect_google_sheet()
@@ -133,5 +133,6 @@ except Exception as e:
     import traceback
 
     st.text(traceback.format_exc()) # エラーの発生場所（何行目か）を表示
+
 
 

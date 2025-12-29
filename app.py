@@ -71,46 +71,45 @@ st.subheader("📊 現在のデータ (Google Sheets)")
 st.divider() # 区切り線
 st.subheader("🗑 データの削除")
 
-# 削除用のデータ読み込み（新しい順ではなく、登録順＝シートの上から順に表示）
-# ※スプレッドシートの行番号と合わせるため、ソートせずに読み込みます
-raw_df = pd.DataFrame(sheet.get_all_records())
+try:
+    # ★修正ポイント：ここでもう一度シートに接続する！
+    sheet = connect_google_sheet()
+    
+    # データを読み込む
+    raw_df = pd.DataFrame(sheet.get_all_records())
 
-if not raw_df.empty:
-    # ユーザーが選びやすいように、「No. - 日付 - 内容」のリストを作る
-    # enumerateを使って、0, 1, 2... という番号（インデックス）を取得
-    options = []
-    for i, row in raw_df.iterrows():
-        # 表示用テキスト: "No.0 | 2024-01-01 | コンビニ | -500"
-        option_text = f"No.{i} | {row['日付']} | {row['項目']} | {row['金額']}円"
-        options.append(option_text)
+    if not raw_df.empty:
+        # ユーザーが選びやすいようにリストを作る
+        options = []
+        for i, row in raw_df.iterrows():
+            # 表示用: No.行番号 | 日付 | 項目 | 金額
+            option_text = f"No.{i} | {row['日付']} | {row['項目']} | {row['金額']}円"
+            options.append(option_text)
 
-    # 削除するデータを選択ボックスで選ぶ
-    # optionsの最後（最新の登録）をデフォルトで選んでおく
-    selected_option = st.selectbox("削除するデータを選んでください", options, index=len(options)-1)
+        # 削除するデータを選ぶ（デフォルトは最新）
+        selected_option = st.selectbox("削除するデータを選んでください", options, index=len(options)-1)
 
-    # 削除ボタン
-    if st.button("選んだデータを削除する"):
-        try:
-            # "No.5 | ..." の文字列から、先頭の数字 "5" を取り出す
+        # 削除ボタン
+        if st.button("選んだデータを削除する"):
+            # "No.5" の "5" を取り出す
             selected_index = int(selected_option.split(" | ")[0].replace("No.", ""))
             
-            # Googleスプレッドシートの行番号を計算
-            # データは0番から始まるが、シートは1行目が見出しなので、
-            # 削除したい行 = インデックス + 2行目
+            # スプレッドシートの行番号（データ開始は2行目から）
             row_to_delete = selected_index + 2
             
             # 削除実行
             sheet.delete_rows(row_to_delete)
             
             st.success("削除しました！")
-            
-            # 画面を更新して最新の状態にする
-            st.rerun()
-            
-        except Exception as e:
-            st.error(f"削除に失敗しました: {e}")
-else:
-    st.info("削除できるデータがありません")
+            st.rerun() # 画面更新
+
+    else:
+        st.info("削除できるデータがありません")
+
+except Exception as e:
+    # もし接続などでエラーが出たらここに表示
+    st.error("削除機能の読み込みに失敗しました")
+    # st.text(e) # 必要なら詳細を表示
 
 try:
     sheet = connect_google_sheet()
@@ -134,4 +133,5 @@ except Exception as e:
     import traceback
 
     st.text(traceback.format_exc()) # エラーの発生場所（何行目か）を表示
+
 

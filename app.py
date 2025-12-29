@@ -24,7 +24,7 @@ def connect_google_sheet():
     # 2. なければ、クラウド上の "Secrets" から読み込む
     else:
         # 文字列として保存されたJSONを読み込んで辞書にする
-        key_dict = json.loads(st.secrets["GCP_KEY_JSON"])
+        key_dict = json.loads(st.secrets["GCP_KEY_JSON"], strict=False)
         creds = ServiceAccountCredentials.from_json_keyfile_dict(key_dict, scope)
         
     client = gspread.authorize(creds)
@@ -85,4 +85,5 @@ except Exception as e:
     st.error("スプレッドシートを読み込めませんでした。")
     st.write(e) # textをwriteに変更すると、詳細が見やすくなります
     import traceback
+
     st.text(traceback.format_exc()) # エラーの発生場所（何行目か）を表示

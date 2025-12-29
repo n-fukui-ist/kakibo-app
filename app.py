@@ -87,9 +87,6 @@ try:
         # 見やすく表示
         st.dataframe(df, use_container_width=True)
         
-        # 合計計算
-        total = df["金額"].sum()
-        st.metric("現在の残高", f"¥{total:,}")
 
         # 日付で見やすく並べ替え
         df["日付"] = pd.to_datetime(df["日付"])
@@ -180,6 +177,7 @@ try:
 except Exception as e:
     st.error("削除機能のエラー詳細:")
     st.write(e) # これでエラー内容が画面に出ます
+
 
 
 

@@ -65,6 +65,29 @@ if st.sidebar.button("登録する"):
 # --- データ表示エリア ---
 st.subheader("📊 現在のデータ (Google Sheets)")
 
+try:
+    sheet = connect_google_sheet()
+    # 全データを取得してPandasの表にする
+    data = sheet.get_all_records()
+    df = pd.DataFrame(data)
+
+    if not df.empty:
+        # 見やすく表示
+        st.dataframe(df, use_container_width=True)
+        
+        # 合計計算
+        total = df["金額"].sum()
+        st.metric("現在の残高", f"¥{total:,}")
+    else:
+        st.info("データがまだありません。")
+
+except Exception as e:
+    st.error("スプレッドシートを読み込めませんでした。")
+    st.write(e) # textをwriteに変更すると、詳細が見やすくなります
+    import traceback
+
+    st.text(traceback.format_exc()) # エラーの発生場所（何行目か）を表示
+
 # ==========================================
 # 削除機能エリア（修正版）
 # ==========================================
@@ -110,30 +133,6 @@ try:
 except Exception as e:
     st.error("削除機能のエラー詳細:")
     st.write(e) # これでエラー内容が画面に出ます
-
-try:
-    sheet = connect_google_sheet()
-    # 全データを取得してPandasの表にする
-    data = sheet.get_all_records()
-    df = pd.DataFrame(data)
-
-    if not df.empty:
-        # 見やすく表示
-        st.dataframe(df, use_container_width=True)
-        
-        # 合計計算
-        total = df["金額"].sum()
-        st.metric("現在の残高", f"¥{total:,}")
-    else:
-        st.info("データがまだありません。")
-
-except Exception as e:
-    st.error("スプレッドシートを読み込めませんでした。")
-    st.write(e) # textをwriteに変更すると、詳細が見やすくなります
-    import traceback
-
-    st.text(traceback.format_exc()) # エラーの発生場所（何行目か）を表示
-
 
 
 

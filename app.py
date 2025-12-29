@@ -117,10 +117,6 @@ try:
         col2.metric("未回収の立替", f"¥{pending_amount:,}", help="これから戻ってくる予定の金額")
         col3.metric("回収後の見込み", f"¥{future_balance:,}", delta_color="off")
 
-        # --- 以下、表やグラフの表示（既存のまま） ---
-        st.divider()
-        st.dataframe(df, use_container_width=True)
-        # ...
     else:
         st.info("データがまだありません。")
 
@@ -177,6 +173,7 @@ try:
 except Exception as e:
     st.error("削除機能のエラー詳細:")
     st.write(e) # これでエラー内容が画面に出ます
+
 
 
 
